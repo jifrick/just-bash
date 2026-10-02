@@ -36,10 +36,20 @@ describe("ls", () => {
 
     const shortResult = await env.exec("ls -i /dir");
     expect(shortResult.stdout).toMatch(/^\d+ a\.txt\n\d+ b\.txt\n$/);
+    const shortInodes =
+      shortResult.stdout.match(/^\d+(?= )/gm)?.map(Number) ?? [];
+    expect(shortInodes).toHaveLength(2);
+    expect(shortInodes.every((inode) => inode > 0)).toBe(true);
+    expect(new Set(shortInodes).size).toBe(2);
     expect(shortResult.stderr).toBe("");
 
     const longResult = await env.exec("ls --inode /dir");
     expect(longResult.stdout).toMatch(/^\d+ a\.txt\n\d+ b\.txt\n$/);
+    const longInodes =
+      longResult.stdout.match(/^\d+(?= )/gm)?.map(Number) ?? [];
+    expect(longInodes).toHaveLength(2);
+    expect(longInodes.every((inode) => inode > 0)).toBe(true);
+    expect(new Set(longInodes).size).toBe(2);
     expect(longResult.stderr).toBe("");
   });
 
