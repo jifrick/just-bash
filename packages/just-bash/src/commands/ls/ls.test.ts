@@ -26,6 +26,23 @@ describe("ls", () => {
     expect(result.stderr).toBe("");
   });
 
+  it("should print inode numbers with -i and --inode", async () => {
+    const env = new Bash({
+      files: {
+        "/dir/a.txt": "",
+        "/dir/b.txt": "",
+      },
+    });
+
+    const shortResult = await env.exec("ls -i /dir");
+    expect(shortResult.stdout).toMatch(/^\d+ a\.txt\n\d+ b\.txt\n$/);
+    expect(shortResult.stderr).toBe("");
+
+    const longResult = await env.exec("ls --inode /dir");
+    expect(longResult.stdout).toMatch(/^\d+ a\.txt\n\d+ b\.txt\n$/);
+    expect(longResult.stderr).toBe("");
+  });
+
   it("should hide hidden files by default", async () => {
     const env = new Bash({
       files: {
