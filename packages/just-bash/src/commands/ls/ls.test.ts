@@ -43,6 +43,32 @@ describe("ls", () => {
     expect(longResult.stderr).toBe("");
   });
 
+  it("should print inodes before the mode in long format", async () => {
+    const env = new Bash({
+      files: {
+        "/dir/file.txt": "",
+      },
+    });
+
+    const fileResult = await env.exec("ls -il /dir/file.txt");
+    expect(fileResult.stdout).toMatch(
+      /^\d+ -rw-r--r-- 1 user user\s+0 \w{3}\s+\d+\s+[\d:]+\s+\/dir\/file\.txt\n$/,
+    );
+
+    const directoryResult = await env.exec("ls -il /dir");
+    expect(directoryResult.stdout).toMatch(
+      /^total 1\n\d+ -rw-r--r-- 1 user user\s+0 \w{3}\s+\d+\s+[\d:]+\s+file\.txt\n$/,
+    );
+
+    const directoryOnlyResult = await env.exec("ls -ild /dir");
+    expect(directoryOnlyResult.stdout).toMatch(
+      /^\d+ drwxr-xr-x 1 user user\s+\d+ \w{3}\s+\d+\s+[\d:]+\s+\/dir\n$/,
+    );
+    expect(fileResult.stderr).toBe("");
+    expect(directoryResult.stderr).toBe("");
+    expect(directoryOnlyResult.stderr).toBe("");
+  });
+
   it("should hide hidden files by default", async () => {
     const env = new Bash({
       files: {

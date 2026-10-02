@@ -505,7 +505,7 @@ async function listPath(
         const dateStr = formatDate(mtime);
         const inode = showInode ? `${String(stat.ino ?? 0)} ` : "";
         return {
-          stdout: `-rw-r--r-- 1 user user ${sizeStr} ${dateStr} ${inode}${path}${fileSuffix}\n`,
+          stdout: `${inode}-rw-r--r-- 1 user user ${sizeStr} ${dateStr} ${path}${fileSuffix}\n`,
           stderr: "",
           exitCode: 0,
         };
