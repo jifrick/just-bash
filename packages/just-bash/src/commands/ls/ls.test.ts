@@ -38,6 +38,8 @@ describe("ls", () => {
     expect(shortResult.stdout).toMatch(/^\d+ a\.txt\n\d+ b\.txt\n$/);
     const shortInodes =
       shortResult.stdout.match(/^\d+(?= )/gm)?.map(Number) ?? [];
+    const repeatedShortResult = await env.exec("ls -i /dir");
+    expect(repeatedShortResult.stdout).toBe(shortResult.stdout);
     expect(shortInodes).toHaveLength(2);
     expect(shortInodes.every((inode) => inode > 0)).toBe(true);
     expect(new Set(shortInodes).size).toBe(2);
@@ -51,6 +53,12 @@ describe("ls", () => {
     expect(longInodes.every((inode) => inode > 0)).toBe(true);
     expect(new Set(longInodes).size).toBe(2);
     expect(longResult.stderr).toBe("");
+
+    const directoryResult = await env.exec("ls -id /dir");
+    const repeatedDirectoryResult = await env.exec("ls -id /dir");
+    expect(directoryResult.stdout).toMatch(/^\d+ \/dir\n$/);
+    expect(repeatedDirectoryResult.stdout).toBe(directoryResult.stdout);
+    expect(Number(directoryResult.stdout.match(/^\d+/)?.[0])).toBeGreaterThan(0);
   });
 
   it("should print inodes before the mode in long format", async () => {

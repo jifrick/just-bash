@@ -6,12 +6,20 @@ describe("InMemoryFs Buffer and Encoding Support", () => {
     const fs = new InMemoryFs({
       "/file.txt": "content",
       "/other.txt": "other",
+      "/directory/nested.txt": "nested",
     });
 
     const fileStat = await fs.stat("/file.txt");
     expect(fileStat.ino).toBeGreaterThan(0);
+    expect((await fs.stat("/file.txt")).ino).toBe(fileStat.ino);
     expect((await fs.lstat("/file.txt")).ino).toBe(fileStat.ino);
     expect((await fs.stat("/other.txt")).ino).not.toBe(fileStat.ino);
+
+    const directoryStat = await fs.stat("/directory");
+    expect(directoryStat.ino).toBeGreaterThan(0);
+    expect((await fs.lstat("/directory")).ino).toBe(directoryStat.ino);
+    expect((await fs.stat("/directory")).ino).toBe(directoryStat.ino);
+    expect(directoryStat.ino).not.toBe(fileStat.ino);
 
     await fs.link("/file.txt", "/hard-link.txt");
     expect((await fs.lstat("/hard-link.txt")).ino).toBe(fileStat.ino);
